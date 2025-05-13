@@ -6,39 +6,29 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1359</width>
-    <height>670</height>
+    <width>1920</width>
+    <height>1080</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="ViewWidget" name="cameraView">
+  <widget class="QListWidget" name="word_choice_lst">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>10</y>
-     <width>931</width>
-     <height>521</height>
+     <x>1240</x>
+     <y>20</y>
+     <width>361</width>
+     <height>911</height>
     </rect>
    </property>
   </widget>
-  <widget class="QListWidget" name="listWidget">
-   <property name="geometry">
-    <rect>
-     <x>970</x>
-     <y>10</y>
-     <width>371</width>
-     <height>521</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLabel" name="outputLabel">
+  <widget class="QLabel" name="result">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>549</y>
-     <width>1321</width>
+     <y>950</y>
+     <width>1581</width>
      <height>51</height>
     </rect>
    </property>
@@ -68,11 +58,11 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QPushButton" name="resetButton">
+  <widget class="QPushButton" name="reset_btn">
    <property name="geometry">
     <rect>
-     <x>530</x>
-     <y>620</y>
+     <x>760</x>
+     <y>1020</y>
      <width>121</width>
      <height>31</height>
     </rect>
@@ -86,11 +76,11 @@
     <string>Reset</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="exitButton">
+  <widget class="QPushButton" name="exit_btn">
    <property name="geometry">
     <rect>
-     <x>750</x>
-     <y>620</y>
+     <x>910</x>
+     <y>1020</y>
      <width>121</width>
      <height>31</height>
     </rect>
@@ -104,14 +94,41 @@
     <string>Exit</string>
    </property>
   </widget>
+  <widget class="QLabel" name="camera_view">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>20</y>
+     <width>1211</width>
+     <height>911</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::Box</enum>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="clear_btn">
+   <property name="geometry">
+    <rect>
+     <x>600</x>
+     <y>1020</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Clear</string>
+   </property>
+  </widget>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>ViewWidget</class>
-   <extends>QGraphicsView</extends>
-   <header>viewwidget</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>
