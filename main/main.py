@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QMainWindow
-from gui import Ui_window
+from gui import Ui_MainWindow
 from camera_worker import CameraWorker
 
 
@@ -10,7 +10,7 @@ class Main_Window(QMainWindow):
         super().__init__()
 
         # Required to setup UI with designer
-        self.ui = Ui_window()
+        self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         ####################
 

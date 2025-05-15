@@ -1,0 +1,112 @@
+# -*- coding: utf-8 -*-
+"""
+Contains the class definition to predict hand landmarks using mediapipe
+and predict hand sign based on hand landmarks using Pytorch neural network model.
+The model currently predicts only LEFT hand sign and has 26 letters prediction.
+"""
+import mediapipe as mp
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import Dataset, DataLoader, random_split
+import torchvision
+import torchvision.transforms as transforms
+from torchvision.datasets import ImageFolder
+
+# using GPU for neural network prediction
+DEVICE = (
+    torch.accelerator.current_accelerator().type
+    if torch.accelerator.is_available()
+    else "cpu"
+)
+print(f"Using {DEVICE} device")
+
+
+class PredictionModel:
+    def __init__(self):
+        # Mediapipe lanndmarks detection
+        self.mp_hands = mp.solutions.hands
+        self.mp_drawing = mp.solutions.drawing_utils
+        self.mp_drawing_styles = mp.solutions.drawing_styles
+        self.hands = self.mp_hands.Hands(
+            static_image_mode=True,
+            min_detection_confidence=0.6,
+            max_num_hands=1,
+        )
+
+        # Pytorch neural net model detection
+        self.model = torch.jit.load("model.pth")
+        self.model.eval()
+        self.model.to(DEVICE)
+
+    def landmarks_detection(self, frame):
+        data_aux, x_, y_ = [], [], []
+        H, W, channel = frame.shape
+        results = self.hands.process(frame)
+        # Only predicting left hand
+        if (
+            results.multi_hand_landmarks
+            and results.multi_handedness[0].classification[0].label == "Left"
+        ):
+            for hand_landmarks in results.multi_hand_landmarks:
+                # Drawing landmarks per displayed frame
+                self.mp_drawing.draw_landmarks(
+                    frame,  # image to draw
+                    hand_landmarks,  # model output
+                    self.mp_hands.HAND_CONNECTIONS,  # hand connections
+                    self.mp_drawing_styles.get_default_hand_landmarks_style(),
+                    self.mp_drawing_styles.get_default_hand_connections_style(),
+                )
+
+            for i in range(len(hand_landmarks.landmark)):
+                x = hand_landmarks.landmark[i].x
+                y = hand_landmarks.landmark[i].y
+
+                x_.append(x)
+                y_.append(y)
+
+            x_min, x_max = min(x_), max(x_)
+            y_min, y_max = min(y_), max(y_)
+
+            for i in range(len(hand_landmarks.landmark)):
+                x = hand_landmarks.landmark[i].x
+                y = hand_landmarks.landmark[i].y
+                data_aux.append(x - x_min)
+                data_aux.append(y - y_min)
+
+            predicted_character = self.hand_sign_prediction(data_aux)
+
+            # (x1, y1) is the top left corner of the box
+            x1 = int(x_min * W) - 10
+            y1 = int(y_min * H) - 10
+
+            # (x2, y2) is the bottom right corner of the box
+            x2 = int(x_max * W) - 10
+            y2 = int(y_max * H) - 10
+
+    def hand_sign_prediction(self, data_aux):
+        data_aux = torch.tensor(data_aux, dtype=torch.float32).flatten()
+        predictions_log = model(data_aux.unsqueeze(0).to(DEVICE))
+        predictions_prob = torch.exp(predictions_log)
+        max_probability_predicted, max_probability_index = torch.max(
+            predictions_prob, dim=1
+        )
+        if max_probability_predicted.item() >= 0.65:
+            predicted_character = chr(
+                max_probability_index.item() + 65
+            )  # chr(65) = 'A'
+            return predicted_character
+        else:
+            return None
+
+            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 0), 4)
+            cv2.putText(
+                frame,
+                predicted_character,
+                (x2, y2 - 10),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                1.3,
+                (0, 0, 0),
+                3,
+                cv2.LINE_AA,
+            )
