@@ -29,22 +29,30 @@ class Main_Window(QMainWindow):
     def run(self):
         next
 
-    def closeEvent(self, event=None):
+    def closeEvent(self, event=None) -> None:
         print("stopping program")
         self.camera_worker.stop()
 
-    def camera_update_slot(self, frame):
-        frame = self.camera_worker.scale_frame_to_label(self.ui.camera, frame)
+    def camera_update_slot(self, frame) -> None:
+        """
+        Slot function to handle updating the pyqt GUI label with the live camera feed
+
+        Args:
+            frame (QImage): frame processed with prediction and boundary detection box.
+
+        """
+
+        frame = CameraWorker.scale_frame_to_label(self.ui.camera, frame)
         self.ui.camera.setPixmap(QPixmap.fromImage(frame))
 
-    def clear_btn_clicked(self):
+    def clear_btn_clicked(self) -> None:
         next
 
-    def reset_btn_clicked(self):
+    def reset_btn_clicked(self) -> None:
         # self.ui.output.setText("testing")
         self.ui.output.clear()
 
-    def exit_btn_clicked(self):
+    def exit_btn_clicked(self) -> None:
         self.close()
 
 

@@ -6,12 +6,6 @@ The model currently predicts only LEFT hand sign and has 26 letters prediction.
 """
 import mediapipe as mp
 import torch
-import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import Dataset, DataLoader, random_split
-import torchvision
-import torchvision.transforms as transforms
-from torchvision.datasets import ImageFolder
 
 # using GPU for neural network prediction
 DEVICE = (
@@ -35,15 +29,34 @@ class PredictionModel:
         )
 
         # Pytorch neural net model detection
-        self.model = torch.jit.load("model.pth")
+        self.model = torch.jit.load("model.pth.rar")
         self.model.eval()
         self.model.to(DEVICE)
 
-    def landmarks_detection(self, frame):
+    def stop(self):
+        del self.model
+
+    def prediction(self, frame) -> (object, tuple, tuple, str):
+        """
+        Function to make hand landmarks prediction and
+        hand sign prediction using a camera frame
+
+        Args:
+            frame (cv2 frame): frame collected from the camera.
+
+        Returns:
+            (object, tuple, tuple, str): return a cv2 frame with drawn landmarks,
+            a tuple containing top left position of boundary box,
+            a tuple containing bottom right position of boundary box,
+            and predicted hand sign character from the model.
+
+        """
+
         data_aux, x_, y_ = [], [], []
+        top_left_boundary, bottom_right_boundary = (), ()
         H, W, channel = frame.shape
         results = self.hands.process(frame)
-        # Only predicting left hand
+        # hand landmarks prediction for left hand only
         if (
             results.multi_hand_landmarks
             and results.multi_handedness[0].classification[0].label == "Left"
@@ -74,39 +87,42 @@ class PredictionModel:
                 data_aux.append(x - x_min)
                 data_aux.append(y - y_min)
 
-            predicted_character = self.hand_sign_prediction(data_aux)
-
             # (x1, y1) is the top left corner of the box
-            x1 = int(x_min * W) - 10
-            y1 = int(y_min * H) - 10
-
+            top_left_boundary = (int(x_min * W) - 10, int(y_min * H) - 10)
             # (x2, y2) is the bottom right corner of the box
-            x2 = int(x_max * W) - 10
-            y2 = int(y_max * H) - 10
+            bottom_right_boundary = (int(x_max * W) - 10, int(y_max * H) - 10)
 
-    def hand_sign_prediction(self, data_aux):
-        data_aux = torch.tensor(data_aux, dtype=torch.float32).flatten()
-        predictions_log = model(data_aux.unsqueeze(0).to(DEVICE))
-        predictions_prob = torch.exp(predictions_log)
-        max_probability_predicted, max_probability_index = torch.max(
-            predictions_prob, dim=1
+        return (
+            frame,
+            top_left_boundary,
+            bottom_right_boundary,
+            self.hand_sign_prediction(data_aux),
         )
-        if max_probability_predicted.item() >= 0.65:
-            predicted_character = chr(
-                max_probability_index.item() + 65
-            )  # chr(65) = 'A'
-            return predicted_character
-        else:
-            return None
 
-            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 0), 4)
-            cv2.putText(
-                frame,
-                predicted_character,
-                (x2, y2 - 10),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                1.3,
-                (0, 0, 0),
-                3,
-                cv2.LINE_AA,
-            )
+    def hand_sign_prediction(self, data_aux: list) -> str:
+        """
+        Function to execute hand sign prediction using the neural network model
+
+        Args:
+            data_aux (list): list of hand landmarks detected using media pipe.
+
+        Returns:
+            str: the predicted character (A - Z).
+
+        """
+
+        if data_aux:
+            with torch.no_grad():
+                data_aux = torch.tensor(
+                    data_aux, dtype=torch.float32
+                ).flatten()
+                predictions_log = self.model(data_aux.unsqueeze(0).to(DEVICE))
+                predictions_prob = torch.exp(predictions_log)
+                max_probability_predicted, max_probability_index = torch.max(
+                    predictions_prob, dim=1
+                )
+                if max_probability_predicted.item() >= 0.65:
+                    predicted_character = chr(
+                        max_probability_index.item() + 65
+                    )  # chr(65) = 'A'
+                    return predicted_character

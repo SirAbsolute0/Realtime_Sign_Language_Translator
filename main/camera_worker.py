@@ -17,16 +17,18 @@ class CameraWorker(QThread):
         self.thread_active = True
         self.camera = Camera()
 
-    def run(self):
+    def run(self) -> None:
         while self.thread_active:
             frame = self.camera.collect_frame()
-            self.camera_data_ready.emit(frame)
+            if frame is not None:
+                self.camera_data_ready.emit(frame)
 
-    def stop(self):
+    def stop(self) -> None:
         self.camera.stop_camera()
         self.thread_active = False
 
-    def scale_frame_to_label(self, label, frame):
+    @staticmethod
+    def scale_frame_to_label(label, frame) -> object:
         """
         Function to be called from main to scale the video to the size of the displayed label at anytime.
 
