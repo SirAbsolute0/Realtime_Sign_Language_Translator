@@ -3,6 +3,7 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from gui import Ui_MainWindow
 from camera_worker import CameraWorker
+from word_search_worker import WordSearchWorker
 
 
 class Main_Window(QMainWindow):
@@ -14,6 +15,11 @@ class Main_Window(QMainWindow):
         self.ui.setupUi(self)
         ####################
 
+        #
+        self.thread_active = True
+        self.text_output = ""
+        #
+
         # Buttons slot assignment
         self.ui.clear_btn.clicked.connect(self.clear_btn_clicked)
         self.ui.reset_btn.clicked.connect(self.reset_btn_clicked)
@@ -24,6 +30,17 @@ class Main_Window(QMainWindow):
         self.camera_worker.camera_data_ready.connect(self.camera_update_slot)
         self.camera_worker.start()
 
+        # Initiate word search worker for live word auto complete base on input
+        self.word_search_worker = WordSearchWorker()
+        self.word_search_worker.auto_complete_result_ready.connect(
+            self.word_search_slot
+        )
+        self.ui.word_choice.itemClicked.connect(
+            self.word_choice_list_item_clicked
+        )
+        self.word_search_worker.start()
+
+        self.word_search_worker.display_possible_words("a")
         self.run()
 
     def run(self):
@@ -32,6 +49,7 @@ class Main_Window(QMainWindow):
     def closeEvent(self, event=None) -> None:
         print("stopping program")
         self.camera_worker.stop()
+        self.word_search_worker.stop()
 
     def camera_update_slot(self, frame) -> None:
         """
@@ -45,14 +63,22 @@ class Main_Window(QMainWindow):
         frame = CameraWorker.scale_frame_to_label(self.ui.camera, frame)
         self.ui.camera.setPixmap(QPixmap.fromImage(frame))
 
+    def word_search_slot(self, word_list: list) -> None:
+        self.ui.word_choice.addItems(word_list)
+
+    def word_choice_list_item_clicked(self, item: object) -> None:
+        self.text_output += item.text() + " "
+        self.ui.output.setText(self.text_output)
+
     def clear_btn_clicked(self) -> None:
         next
 
     def reset_btn_clicked(self) -> None:
-        # self.ui.output.setText("testing")
+        self.text_output = ""
         self.ui.output.clear()
 
     def exit_btn_clicked(self) -> None:
+        self.thread_active = False
         self.close()
 
 
