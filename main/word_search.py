@@ -40,6 +40,14 @@ class WordSearch:
     def __possible_word_dfs__(
         self, node: TrieNode, auto_completed_result: list, curr_word: str
     ) -> None:
+        """
+        DFS function to search all possible words from the given
+        TrieNode branch
+
+        Args:
+            auto_completed_result (list): list of all possible words
+            curr_word (str): current word from the branch
+        """
         # Base cases
         if node.end_of_word:
             auto_completed_result.append(curr_word)

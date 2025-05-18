@@ -15,11 +15,6 @@ class Main_Window(QMainWindow):
         self.ui.setupUi(self)
         ####################
 
-        #
-        self.thread_active = True
-        self.text_output = ""
-        #
-
         # Buttons slot assignment
         self.ui.clear_btn.clicked.connect(self.clear_btn_clicked)
         self.ui.reset_btn.clicked.connect(self.reset_btn_clicked)
@@ -40,23 +35,26 @@ class Main_Window(QMainWindow):
         )
         self.word_search_worker.start()
 
-        self.word_search_worker.display_possible_words("a")
         self.run()
 
     def run(self):
         next
 
     def closeEvent(self, event=None) -> None:
-        print("stopping program")
         self.camera_worker.stop()
         self.word_search_worker.stop()
 
+        self.camera_worker.wait()
+        # word_search doesn't have a inf loop so no need to wait
+
     def camera_update_slot(self, frame) -> None:
         """
-        Slot function to handle updating the pyqt GUI label with the live camera feed
+        Slot function to handle updating the pyqt  qlabel with the live
+        camera feed
 
         Args:
-            frame (QImage): frame processed with prediction and boundary detection box.
+            frame (QImage): frame processed with prediction and boundary
+            detection box.
 
         """
 
@@ -64,11 +62,30 @@ class Main_Window(QMainWindow):
         self.ui.camera.setPixmap(QPixmap.fromImage(frame))
 
     def word_search_slot(self, word_list: list) -> None:
+        """
+        Slot function to handle updating the pyqt qlistwidget with the
+        current auto completion list of words.
+
+        Args:
+            word_list (list): auto completed list of words for display.
+
+        """
+
         self.ui.word_choice.addItems(word_list)
 
-    def word_choice_list_item_clicked(self, item: object) -> None:
-        self.text_output += item.text() + " "
-        self.ui.output.setText(self.text_output)
+    def word_choice_list_item_clicked(self, word_item: object) -> None:
+        """
+        Linked the click of each word (item) on the qlistwidget to displaying
+        the given word on the full result output qlabel.
+
+        Args:
+            word_item (object): qt object from the qlistwidget each is
+            a word.
+        """
+
+        # self.text_output += word_item.text() + " "
+        # self.ui.output.setText(self.text_output)
+        next
 
     def clear_btn_clicked(self) -> None:
         next
@@ -78,7 +95,6 @@ class Main_Window(QMainWindow):
         self.ui.output.clear()
 
     def exit_btn_clicked(self) -> None:
-        self.thread_active = False
         self.close()
 
 

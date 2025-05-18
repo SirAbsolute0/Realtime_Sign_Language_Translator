@@ -12,8 +12,8 @@ from typing import Optional
 
 class Camera:
     def __init__(self):
-        self.cap = cv2.VideoCapture(0)
-        self.prediction_model = PredictionModel()
+        self.__cap__ = cv2.VideoCapture(0)
+        self.__prediction_model__ = PredictionModel()
 
     def collect_frame(self) -> Optional[QImage]:
         """
@@ -27,7 +27,7 @@ class Camera:
 
         """
 
-        ret, frame = self.cap.read()
+        ret, frame = self.__cap__.read()
         if ret:
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             frame_flipped = cv2.flip(frame_rgb, 1)
@@ -36,8 +36,8 @@ class Camera:
                 top_left_boundary,
                 bottom_right_boundary,
                 predicted_char,
-            ) = self.prediction_model.prediction(frame_flipped)
-            final_frame = self.draw_character_boundary(
+            ) = self.__prediction_model__.prediction(frame_flipped)
+            final_frame = self.__draw_character_boundary__(
                 frame_with_prediction,
                 top_left_boundary,
                 bottom_right_boundary,
@@ -48,7 +48,7 @@ class Camera:
             qt_frame = QImage(final_frame.data, W, H, QImage.Format_RGB888)
             return qt_frame
 
-    def draw_character_boundary(
+    def __draw_character_boundary__(
         self,
         frame,
         top_left_boundary: tuple,
@@ -56,17 +56,21 @@ class Camera:
         predicted_char: str,
     ) -> object:
         """
-        Function to draw character boundary box for the given character based on
-        top left point and bottom right point of the boundary box
+        Function to draw character boundary box for the given character
+        based on top left point and bottom right point of the boundary box
 
         Args:
             frame (cv2 frame): frame processed from mediapipe model
-            top_left_boundary (tuple): (x1, y1) position of the top left boundary box
-            bottom_right_boundary (tuple): (x2, y2) position of the bottom right boundary box
-            predicted_char (str): predicted character by the neural network model
+            top_left_boundary (tuple): (x1, y1) position of the top left
+            boundary box
+            bottom_right_boundary (tuple): (x2, y2) position of the bottom
+            right boundary box
+            predicted_char (str): predicted character by the neural network
+            model
 
         Returns:
-            frame (cv2 frame): cv2 frame with drawn boundary box and predicted character
+            frame (cv2 frame): cv2 frame with drawn boundary box and
+            predicted character
 
         """
         if top_left_boundary and bottom_right_boundary:
@@ -87,6 +91,6 @@ class Camera:
         return frame
 
     def stop_camera(self) -> None:
-        self.cap.release()
-        self.prediction_model.stop()
+        self.__cap__.release()
+        self.__prediction_model__.stop()
         cv2.destroyAllWindows()

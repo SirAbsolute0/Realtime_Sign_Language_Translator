@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 Contains the class definition to predict hand landmarks using mediapipe
-and predict hand sign based on hand landmarks using Pytorch neural network model.
-The model currently predicts only LEFT hand sign and has 26 letters prediction.
+and predict hand sign based on hand landmarks using Pytorch neural network
+model. The model currently predicts only LEFT hand sign and has 26 letters
+prediction.
 """
 import mediapipe as mp
 import torch
@@ -15,26 +16,29 @@ DEVICE = (
 )
 print(f"Using {DEVICE} device")
 
+MIN_DETECTION_CONFIDENCE = 0.6
+
 
 class PredictionModel:
     def __init__(self):
         # Mediapipe lanndmarks detection
-        self.mp_hands = mp.solutions.hands
-        self.mp_drawing = mp.solutions.drawing_utils
-        self.mp_drawing_styles = mp.solutions.drawing_styles
-        self.hands = self.mp_hands.Hands(
+        self.__mp_hands__ = mp.solutions.hands
+        self.__mp_drawing__ = mp.solutions.drawing_utils
+        self.__mp_drawing_styles__ = mp.solutions.drawing_styles
+        self.__hands__ = self.__mp_hands__.Hands(
             static_image_mode=True,
-            min_detection_confidence=0.6,
+            min_detection_confidence=MIN_DETECTION_CONFIDENCE,
             max_num_hands=1,
         )
 
         # Pytorch neural net model detection
-        self.model = torch.jit.load("model.pth.rar")
-        self.model.eval()
-        self.model.to(DEVICE)
+        self.__model__ = torch.jit.load("model.pth.rar")
+        self.__model__.eval()
+        self.__model__.to(DEVICE)
 
     def stop(self):
-        del self.model
+        del self.__model__
+        torch.cuda.empty_cache()
 
     def prediction(self, frame) -> (object, tuple, tuple, str):
         """
@@ -45,8 +49,8 @@ class PredictionModel:
             frame (cv2 frame): frame collected from the camera.
 
         Returns:
-            (object, tuple, tuple, str): return a cv2 frame with drawn landmarks,
-            a tuple containing top left position of boundary box,
+            (object, tuple, tuple, str): return a cv2 frame with drawn
+            landmarks,a tuple containing top left position of boundary box,
             a tuple containing bottom right position of boundary box,
             and predicted hand sign character from the model.
 
@@ -55,7 +59,7 @@ class PredictionModel:
         data_aux, x_, y_ = [], [], []
         top_left_boundary, bottom_right_boundary = (), ()
         H, W, channel = frame.shape
-        results = self.hands.process(frame)
+        results = self.__hands__.process(frame)
         # hand landmarks prediction for left hand only
         if (
             results.multi_hand_landmarks
@@ -63,12 +67,12 @@ class PredictionModel:
         ):
             for hand_landmarks in results.multi_hand_landmarks:
                 # Drawing landmarks per displayed frame
-                self.mp_drawing.draw_landmarks(
+                self.__mp_drawing__.draw_landmarks(
                     frame,  # image to draw
                     hand_landmarks,  # model output
-                    self.mp_hands.HAND_CONNECTIONS,  # hand connections
-                    self.mp_drawing_styles.get_default_hand_landmarks_style(),
-                    self.mp_drawing_styles.get_default_hand_connections_style(),
+                    self.__mp_hands__.HAND_CONNECTIONS,  # hand connections
+                    self.__mp_drawing_styles__.get_default_hand_landmarks_style(),
+                    self.__mp_drawing_styles__.get_default_hand_connections_style(),
                 )
 
             for i in range(len(hand_landmarks.landmark)):
@@ -96,10 +100,10 @@ class PredictionModel:
             frame,
             top_left_boundary,
             bottom_right_boundary,
-            self.hand_sign_prediction(data_aux),
+            self.__hand_sign_prediction__(data_aux),
         )
 
-    def hand_sign_prediction(self, data_aux: list) -> str:
+    def __hand_sign_prediction__(self, data_aux: list) -> str:
         """
         Function to execute hand sign prediction using the neural network model
 
@@ -116,12 +120,17 @@ class PredictionModel:
                 data_aux = torch.tensor(
                     data_aux, dtype=torch.float32
                 ).flatten()
-                predictions_log = self.model(data_aux.unsqueeze(0).to(DEVICE))
+                predictions_log = self.__model__(
+                    data_aux.unsqueeze(0).to(DEVICE)
+                )
                 predictions_prob = torch.exp(predictions_log)
                 max_probability_predicted, max_probability_index = torch.max(
                     predictions_prob, dim=1
                 )
-                if max_probability_predicted.item() >= 0.65:
+                if (
+                    max_probability_predicted.item()
+                    >= MIN_DETECTION_CONFIDENCE
+                ):
                     predicted_character = chr(
                         max_probability_index.item() + 65
                     )  # chr(65) = 'A'
