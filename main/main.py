@@ -33,7 +33,7 @@ class Main_Window(QMainWindow):
             self.prediction_workder.predict_hand_sign
         )
         self.prediction_workder.processed_frame_ready.connect(
-            self.camera_worker.collect_processed_frame
+            self.camera_worker.generate_final_frame
         )
         self.prediction_workder.hand_sign_prediction_ready.connect(
             self.prediction_slot
@@ -57,9 +57,10 @@ class Main_Window(QMainWindow):
 
     def closeEvent(self, event=None) -> None:
         self.camera_worker.stop()
+        self.prediction_workder.stop()
         self.word_search_worker.stop()
 
-        self.camera_worker.wait()
+        # self.camera_worker.wait()
         # word_search doesn't have a inf loop so no need to wait
 
     def camera_update_slot(self, frame) -> None:

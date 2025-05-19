@@ -5,9 +5,8 @@ the main window.
 """
 
 from PyQt5.QtGui import QImage
-from PyQt5.QtCore import QThread, pyqtSignal, Qt
+from PyQt5.QtCore import QThread, pyqtSignal, Qt, pyqtSlot
 from camera import Camera
-import time
 
 
 class CameraWorker(QThread):
@@ -20,33 +19,41 @@ class CameraWorker(QThread):
         super().__init__()
         self.__thread_active__ = True
         self.__camera__ = Camera()
-        self.__final_frame__ = None
 
     def run(self) -> None:
         while self.__thread_active__:
             frame = self.__camera__.collect_frame()
             if frame is not None:
+                # send cv2 frame to prediction_worker for processing
                 self.unprocessed_frame_ready.emit(frame)
-                time.sleep(0.1)
-                if self.__final_frame__ is not None:
-                    self.final_frame_ready.emit(self.__final_frame__)
-                    self.__final_frame__ = None
         return
 
-    def collect_processed_frame(
+    @pyqtSlot(object, tuple, tuple, str)
+    def generate_final_frame(
         self,
         frame: object,
         top_left_boundary: tuple,
         bottom_right_boundary: tuple,
         predicted_char: str,
     ) -> None:
-        self.__final_frame__ = self.__camera__.collect_processed_frame(
+        """
+        Function to generate final frame with the processed cv2 frame with
+        prediction from prediction_worker.
+
+        Args:
+            frame (cv2 frame): processed cv2 frame with hand landmarks and
+            hand sign prediction
+            top_left_boundary (tuple): top left boundary box (x1, y1)
+            pixel coordinates
+            bottom_right_boundary (tuple): bottom right boundary box (x2, y2)
+            pixel coordinates
+            predicted_char (str): predicted hand sign character
+
+        """
+        final_frame = self.__camera__.generate_final_frame(
             frame, top_left_boundary, bottom_right_boundary, predicted_char
         )
-
-    def stop(self) -> None:
-        self.__thread_active__ = False
-        self.__camera__.stop_camera()
+        self.final_frame_ready.emit(final_frame)
 
     @staticmethod
     def scale_frame_to_label(label: object, frame: QImage) -> QImage:
@@ -67,3 +74,7 @@ class CameraWorker(QThread):
         return frame.scaled(
             label.size(), Qt.IgnoreAspectRatio, Qt.SmoothTransformation
         )
+
+    def stop(self) -> None:
+        self.__thread_active__ = False
+        self.__camera__.stop()

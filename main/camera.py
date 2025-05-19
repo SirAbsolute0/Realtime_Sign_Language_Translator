@@ -28,13 +28,29 @@ class Camera:
             frame_flipped = cv2.flip(frame_rgb, 1)
             return frame_flipped
 
-    def collect_processed_frame(
+    def generate_final_frame(
         self,
         frame: object,
         top_left_boundary: tuple,
         bottom_right_boundary: tuple,
         predicted_char: str,
     ) -> QImage:
+        """
+        Function to generate final frame with the processed cv2 frame with
+        prediction from prediction_worker.
+
+        Args:
+            frame (cv2 frame): processed cv2 frame with hand landmarks and
+            hand sign prediction
+            top_left_boundary (tuple): top left boundary box (x1, y1)
+            pixel coordinates
+            bottom_right_boundary (tuple): bottom right boundary box (x2, y2)
+            pixel coordinates
+            predicted_char (str): predicted hand sign character
+        Return:
+            qt_frame (QImage): final QImage to be displayed
+
+        """
         final_frame = self.__draw_character_boundary__(
             frame,
             top_left_boundary,
@@ -88,6 +104,6 @@ class Camera:
             )
         return frame
 
-    def stop_camera(self) -> None:
+    def stop(self) -> None:
         self.__cap__.release()
         cv2.destroyAllWindows()

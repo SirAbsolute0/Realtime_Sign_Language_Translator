@@ -36,10 +36,6 @@ class PredictionModel:
         self.__model__.eval()
         self.__model__.to(DEVICE)
 
-    def stop(self):
-        del self.__model__
-        torch.cuda.empty_cache()
-
     def prediction(self, frame) -> (object, tuple, tuple, str):
         """
         Function to make hand landmarks prediction and
@@ -135,3 +131,7 @@ class PredictionModel:
                         max_probability_index.item() + 65
                     )  # chr(65) = 'A'
                     return predicted_character
+
+    def stop(self):
+        del self.__model__
+        torch.cuda.empty_cache()
