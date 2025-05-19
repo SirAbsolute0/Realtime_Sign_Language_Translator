@@ -18,12 +18,13 @@ class CameraWorker(QThread):
     def __init__(self):
         super().__init__()
         self.__thread_active__ = True
+        self.__new_frame__ = True
         self.__camera__ = Camera()
 
     def run(self) -> None:
         while self.__thread_active__:
             frame = self.__camera__.collect_frame()
-            if frame is not None:
+            if frame is not None and self.__new_frame__:
                 # send cv2 frame to prediction_worker for processing
                 self.unprocessed_frame_ready.emit(frame)
         return
@@ -50,10 +51,12 @@ class CameraWorker(QThread):
             predicted_char (str): predicted hand sign character
 
         """
+        self.__new_frame__ = False
         final_frame = self.__camera__.generate_final_frame(
             frame, top_left_boundary, bottom_right_boundary, predicted_char
         )
         self.final_frame_ready.emit(final_frame)
+        self.__new_frame__ = True
 
     @staticmethod
     def scale_frame_to_label(label: object, frame: QImage) -> QImage:

@@ -131,6 +131,7 @@ class PredictionModel:
                         max_probability_index.item() + 65
                     )  # chr(65) = 'A'
                     return predicted_character
+        return "None"
 
     def stop(self):
         del self.__model__

@@ -26,7 +26,7 @@ class Main_Window(QMainWindow):
         self.camera_worker.final_frame_ready.connect(self.camera_update_slot)
         self.camera_worker.start()
 
-        # initiate prediction worker for hand landmarks and hand sign prediction
+        # Initiate prediction worker for hand landmarks and hand sign prediction
         self.prediction_workder = PredictionWorker()
         # connect unprocessed cv2 frame to prediction worker for processing
         self.camera_worker.unprocessed_frame_ready.connect(
@@ -45,6 +45,9 @@ class Main_Window(QMainWindow):
         self.word_search_worker.auto_complete_result_ready.connect(
             self.word_search_slot
         )
+        self.prediction_workder.hand_sign_prediction_ready.connect(
+            self.word_search_worker.add_predicted_char
+        )
         self.ui.word_choice.itemClicked.connect(
             self.word_choice_list_item_clicked
         )
@@ -60,7 +63,7 @@ class Main_Window(QMainWindow):
         self.prediction_workder.stop()
         self.word_search_worker.stop()
 
-        # self.camera_worker.wait()
+        self.camera_worker.wait()
         # word_search doesn't have a inf loop so no need to wait
 
     def camera_update_slot(self, frame) -> None:
