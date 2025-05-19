@@ -6,24 +6,19 @@ Additionally, the class contains the hand landmarks mapping with mediapipe.
 
 import cv2
 from PyQt5.QtGui import QImage
-from prediction import PredictionModel
 from typing import Optional
 
 
 class Camera:
     def __init__(self):
         self.__cap__ = cv2.VideoCapture(0)
-        self.__prediction_model__ = PredictionModel()
 
-    def collect_frame(self) -> Optional[QImage]:
+    def collect_frame(self) -> Optional[object]:
         """
-        Function to get a frame from the main system camera, process landmarks,
-        display landmarks, make prediction, display prediction, and
-        return resulting image convereted to QImage frame for pyqt to display.
+        Function to get a frame from the main system camera and flip it.
 
         Returns:
-            qt_frame (QImage): a frame collected and processed by the mode
-            converted to a QImage for pyqt.
+            object (cv2 frame): a frame collected by camera
 
         """
 
@@ -31,22 +26,25 @@ class Camera:
         if ret:
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             frame_flipped = cv2.flip(frame_rgb, 1)
-            (
-                frame_with_prediction,
-                top_left_boundary,
-                bottom_right_boundary,
-                predicted_char,
-            ) = self.__prediction_model__.prediction(frame_flipped)
-            final_frame = self.__draw_character_boundary__(
-                frame_with_prediction,
-                top_left_boundary,
-                bottom_right_boundary,
-                predicted_char,
-            )
+            return frame_flipped
 
-            H, W, channel = final_frame.shape
-            qt_frame = QImage(final_frame.data, W, H, QImage.Format_RGB888)
-            return qt_frame
+    def collect_processed_frame(
+        self,
+        frame: object,
+        top_left_boundary: tuple,
+        bottom_right_boundary: tuple,
+        predicted_char: str,
+    ) -> QImage:
+        final_frame = self.__draw_character_boundary__(
+            frame,
+            top_left_boundary,
+            bottom_right_boundary,
+            predicted_char,
+        )
+
+        H, W, channel = final_frame.shape
+        qt_frame = QImage(final_frame.data, W, H, QImage.Format_RGB888)
+        return qt_frame
 
     def __draw_character_boundary__(
         self,
@@ -92,5 +90,4 @@ class Camera:
 
     def stop_camera(self) -> None:
         self.__cap__.release()
-        self.__prediction_model__.stop()
         cv2.destroyAllWindows()

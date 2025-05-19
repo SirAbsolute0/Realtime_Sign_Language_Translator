@@ -13,6 +13,7 @@ class WordSearchWorker(QThread):
 
     def __init__(self):
         super().__init__()
+        self.char_dict = {}
         self.word_search = WordSearch()
 
     def display_possible_words(self, curr_word_input: str) -> None:

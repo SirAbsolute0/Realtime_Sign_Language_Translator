@@ -7,22 +7,42 @@ the main window.
 from PyQt5.QtGui import QImage
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from camera import Camera
+import time
 
 
 class CameraWorker(QThread):
-    camera_data_ready = pyqtSignal(QImage)
+    # cv2 frame to be sent to prediction_worker for processing
+    unprocessed_frame_ready = pyqtSignal(object)
+    # final frame to be sent to main for displaying
+    final_frame_ready = pyqtSignal(QImage)
 
     def __init__(self):
         super().__init__()
         self.__thread_active__ = True
         self.__camera__ = Camera()
+        self.__final_frame__ = None
 
     def run(self) -> None:
         while self.__thread_active__:
             frame = self.__camera__.collect_frame()
             if frame is not None:
-                self.camera_data_ready.emit(frame)
+                self.unprocessed_frame_ready.emit(frame)
+                time.sleep(0.1)
+                if self.__final_frame__ is not None:
+                    self.final_frame_ready.emit(self.__final_frame__)
+                    self.__final_frame__ = None
         return
+
+    def collect_processed_frame(
+        self,
+        frame: object,
+        top_left_boundary: tuple,
+        bottom_right_boundary: tuple,
+        predicted_char: str,
+    ) -> None:
+        self.__final_frame__ = self.__camera__.collect_processed_frame(
+            frame, top_left_boundary, bottom_right_boundary, predicted_char
+        )
 
     def stop(self) -> None:
         self.__thread_active__ = False

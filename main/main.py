@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow
 from gui import Ui_MainWindow
 from camera_worker import CameraWorker
 from word_search_worker import WordSearchWorker
+from prediciton_worker import PredictionWorker
 
 
 class Main_Window(QMainWindow):
@@ -22,8 +23,22 @@ class Main_Window(QMainWindow):
 
         # Initiate camera worker for camera live feed
         self.camera_worker = CameraWorker()
-        self.camera_worker.camera_data_ready.connect(self.camera_update_slot)
+        self.camera_worker.final_frame_ready.connect(self.camera_update_slot)
         self.camera_worker.start()
+
+        # initiate prediction worker for hand landmarks and hand sign prediction
+        self.prediction_workder = PredictionWorker()
+        # connect unprocessed cv2 frame to prediction worker for processing
+        self.camera_worker.unprocessed_frame_ready.connect(
+            self.prediction_workder.predict_hand_sign
+        )
+        self.prediction_workder.processed_frame_ready.connect(
+            self.camera_worker.collect_processed_frame
+        )
+        self.prediction_workder.hand_sign_prediction_ready.connect(
+            self.prediction_slot
+        )
+        self.prediction_workder.start()
 
         # Initiate word search worker for live word auto complete base on input
         self.word_search_worker = WordSearchWorker()
@@ -60,6 +75,9 @@ class Main_Window(QMainWindow):
 
         frame = CameraWorker.scale_frame_to_label(self.ui.camera, frame)
         self.ui.camera.setPixmap(QPixmap.fromImage(frame))
+
+    def prediction_slot(self) -> None:
+        next
 
     def word_search_slot(self, word_list: list) -> None:
         """
