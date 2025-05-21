@@ -3,7 +3,7 @@ The software is designed to enable text input through hand sign language recogni
 
 As the user constructs a word, the software dynamically offers word suggestions through an auto-completion feature, which updates in real time as new characters are detected. Users may either select a suggested word from the list or continue inputting additional characters. Once a word is selected, it is appended to the final output area, allowing the user to build complete sentences. The finalized text can then be copied for use elsewhere.
 
-<object data="Hand_Sign_Description.pdf" width="1000" height="1000" type='application/pdf'/>
+![Alt text](https://github.com/SirAbsolute0/Realtime_Sign_Language_Translator/blob/main/hand_description_0.jpg)
 
 ## How It's Made:
 
