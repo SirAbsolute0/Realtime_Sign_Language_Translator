@@ -3,6 +3,8 @@ The software is designed to enable text input through hand sign language recogni
 
 As the user constructs a word, the software dynamically offers word suggestions through an auto-completion feature, which updates in real time as new characters are detected. Users may either select a suggested word from the list or continue inputting additional characters. Once a word is selected, it is appended to the final output area, allowing the user to build complete sentences. The finalized text can then be copied for use elsewhere.
 
+[Intro.pdf]([http://USERNAME.github.io/REPONAME/docs/Intro.pdf](https://github.com/SirAbsolute0/Realtime_Sign_Language_Translator/blob/main/Hand%20Sign%20Description.pdf))
+
 ## How It's Made:
 
 **Tech used:** Python, PyQt, cv2, MediaPipe, Pytorch
