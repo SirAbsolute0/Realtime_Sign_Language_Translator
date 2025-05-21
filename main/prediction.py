@@ -123,10 +123,7 @@ class PredictionModel:
                 max_probability_predicted, max_probability_index = torch.max(
                     predictions_prob, dim=1
                 )
-                if (
-                    max_probability_predicted.item()
-                    >= MIN_DETECTION_CONFIDENCE
-                ):
+                if max_probability_predicted.item() >= 0.15:
                     predicted_character = chr(
                         max_probability_index.item() + 65
                     )  # chr(65) = 'A'

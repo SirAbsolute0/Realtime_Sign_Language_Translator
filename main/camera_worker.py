@@ -27,6 +27,7 @@ class CameraWorker(QThread):
             if frame is not None and self.__new_frame__:
                 # send cv2 frame to prediction_worker for processing
                 self.unprocessed_frame_ready.emit(frame)
+                self.__new_frame__ = False
         return
 
     @pyqtSlot(object, tuple, tuple, str)
@@ -51,7 +52,6 @@ class CameraWorker(QThread):
             predicted_char (str): predicted hand sign character
 
         """
-        self.__new_frame__ = False
         final_frame = self.__camera__.generate_final_frame(
             frame, top_left_boundary, bottom_right_boundary, predicted_char
         )

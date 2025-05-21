@@ -26,7 +26,7 @@ class Main_Window(QMainWindow):
         self.camera_worker.final_frame_ready.connect(self.camera_update_slot)
         self.camera_worker.start()
 
-        # Initiate prediction worker for hand landmarks and hand sign prediction
+        # Initiate prediction worker for hand landmarks and sign prediction
         self.prediction_workder = PredictionWorker()
         # connect unprocessed cv2 frame to prediction worker for processing
         self.camera_worker.unprocessed_frame_ready.connect(
@@ -34,9 +34,6 @@ class Main_Window(QMainWindow):
         )
         self.prediction_workder.processed_frame_ready.connect(
             self.camera_worker.generate_final_frame
-        )
-        self.prediction_workder.hand_sign_prediction_ready.connect(
-            self.prediction_slot
         )
         self.prediction_workder.start()
 
@@ -53,18 +50,30 @@ class Main_Window(QMainWindow):
         )
         self.word_search_worker.start()
 
-        self.run()
-
-    def run(self):
-        next
-
     def closeEvent(self, event=None) -> None:
-        self.camera_worker.stop()
-        self.prediction_workder.stop()
-        self.word_search_worker.stop()
+        workers = [
+            self.camera_worker,
+            self.prediction_workder,
+            self.word_search_worker,
+        ]
+        self.shutdown_workers(workers)
 
-        self.camera_worker.wait()
-        # word_search doesn't have a inf loop so no need to wait
+    def shutdown_workers(self, workers: list[object]) -> None:
+        """
+        Function to gracefully end all threads and their class objects
+
+        Args:
+            workers (list[QThread]): Qthread workers currently running.
+
+        """
+
+        for worker in workers:
+            worker.stop()
+            worker.quit()
+
+        for worker in workers:
+            if worker.isRunning():
+                worker.wait()
 
     def camera_update_slot(self, frame) -> None:
         """
@@ -80,9 +89,6 @@ class Main_Window(QMainWindow):
         frame = CameraWorker.scale_frame_to_label(self.ui.camera, frame)
         self.ui.camera.setPixmap(QPixmap.fromImage(frame))
 
-    def prediction_slot(self) -> None:
-        next
-
     def word_search_slot(self, word_list: list) -> None:
         """
         Slot function to handle updating the pyqt qlistwidget with the
@@ -92,7 +98,7 @@ class Main_Window(QMainWindow):
             word_list (list): auto completed list of words for display.
 
         """
-
+        self.ui.word_choice.clear()
         self.ui.word_choice.addItems(word_list)
 
     def word_choice_list_item_clicked(self, word_item: object) -> None:
@@ -104,17 +110,31 @@ class Main_Window(QMainWindow):
             word_item (object): qt object from the qlistwidget each is
             a word.
         """
+        text_output = self.ui.output.text()
+        text_output += word_item.text() + " "
 
-        # self.text_output += word_item.text() + " "
-        # self.ui.output.setText(self.text_output)
-        next
+        self.ui.output.setText(text_output)
+        self.clear_btn_clicked()
 
     def clear_btn_clicked(self) -> None:
-        next
+        """
+        Function to clear out the word choice list and the current word being
+        searched.
+
+        """
+
+        self.ui.word_choice.clear()
+        self.word_search_worker.clear_current_word()
 
     def reset_btn_clicked(self) -> None:
-        self.text_output = ""
+        """
+        Function to reset the final output, clear word choice, and clear
+        current word being searched
+
+        """
+
         self.ui.output.clear()
+        self.clear_btn_clicked()
 
     def exit_btn_clicked(self) -> None:
         self.close()
