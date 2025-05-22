@@ -7,7 +7,7 @@ concurrently on another thread with other parts of the software
 from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
 from word_search import WordSearch
 
-HAND_SIGN_DETERMINATION_TIME_LIMIT = 120
+HAND_SIGN_DETERMINATION_TIME_LIMIT = 60
 
 
 class WordSearchWorker(QThread):
@@ -15,7 +15,7 @@ class WordSearchWorker(QThread):
 
     def __init__(self):
         super().__init__()
-        self.__last_predicted_char__ = "None"
+        self.__last_predicted_char__ = ""
         self.__counter__ = 0
         self.__current_word__ = ""
         self.__word_search__ = WordSearch()
@@ -46,7 +46,7 @@ class WordSearchWorker(QThread):
 
         if (
             predicted_char == self.__last_predicted_char__
-            and predicted_char != "None"
+            and predicted_char != ""
         ):
             self.__counter__ += 1
             if self.__counter__ >= HAND_SIGN_DETERMINATION_TIME_LIMIT:

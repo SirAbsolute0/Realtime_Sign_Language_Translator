@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QColor
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from gui import Ui_MainWindow
 from camera_worker import CameraWorker
@@ -37,7 +37,7 @@ class Main_Window(QMainWindow):
         )
         self.prediction_workder.start()
 
-        # Initiate word search worker for live word auto complete base on input
+        # Initiate word search worker for word auto complete based on input
         self.word_search_worker = WordSearchWorker()
         self.word_search_worker.auto_complete_result_ready.connect(
             self.word_search_slot
@@ -45,9 +45,7 @@ class Main_Window(QMainWindow):
         self.prediction_workder.hand_sign_prediction_ready.connect(
             self.word_search_worker.add_predicted_char
         )
-        self.ui.word_choice.itemClicked.connect(
-            self.word_choice_list_item_clicked
-        )
+        self.ui.word_choice.itemClicked.connect(self.word_list_item_clicked)
         self.word_search_worker.start()
 
     def closeEvent(self, event=None) -> None:
@@ -98,10 +96,11 @@ class Main_Window(QMainWindow):
             word_list (list): auto completed list of words for display.
 
         """
+        self.signal_chosen_character_flash_screen()
         self.ui.word_choice.clear()
         self.ui.word_choice.addItems(word_list)
 
-    def word_choice_list_item_clicked(self, word_item: object) -> None:
+    def word_list_item_clicked(self, word_item: object) -> None:
         """
         Linked the click of each word (item) on the qlistwidget to displaying
         the given word on the full result output qlabel.
@@ -111,10 +110,25 @@ class Main_Window(QMainWindow):
             a word.
         """
         text_output = self.ui.output.text()
-        text_output += word_item.text() + " "
+        word = word_item.text()
 
+        if text_output == "":
+            word = word.capitalize()
+
+        text_output += word + " "
         self.ui.output.setText(text_output)
         self.clear_btn_clicked()
+
+    def signal_chosen_character_flash_screen(self) -> None:
+        """
+        Function to quickly flash the camera live view signalling a character
+        has been chosen for the word
+
+        """
+
+        pixmap = QPixmap(self.ui.camera.size())
+        pixmap.fill(QColor("white"))
+        self.ui.camera.setPixmap(pixmap)
 
     def clear_btn_clicked(self) -> None:
         """

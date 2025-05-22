@@ -7,6 +7,7 @@ prediction.
 """
 import mediapipe as mp
 import torch
+from typing import Optional
 
 # using GPU for neural network prediction
 DEVICE = (
@@ -16,7 +17,8 @@ DEVICE = (
 )
 print(f"Using {DEVICE} device")
 
-MIN_DETECTION_CONFIDENCE = 0.6
+LANDMARK_MIN_DETECTION_CONFIDENCE = 0.6
+HAND_SIGN_MIN_DETECTION_CONFIDENCE = 0.15
 
 
 class PredictionModel:
@@ -27,7 +29,7 @@ class PredictionModel:
         self.__mp_drawing_styles__ = mp.solutions.drawing_styles
         self.__hands__ = self.__mp_hands__.Hands(
             static_image_mode=True,
-            min_detection_confidence=MIN_DETECTION_CONFIDENCE,
+            min_detection_confidence=LANDMARK_MIN_DETECTION_CONFIDENCE,
             max_num_hands=1,
         )
 
@@ -99,7 +101,7 @@ class PredictionModel:
             self.__hand_sign_prediction__(data_aux),
         )
 
-    def __hand_sign_prediction__(self, data_aux: list) -> str:
+    def __hand_sign_prediction__(self, data_aux: list) -> Optional[str]:
         """
         Function to execute hand sign prediction using the neural network model
 
@@ -123,12 +125,14 @@ class PredictionModel:
                 max_probability_predicted, max_probability_index = torch.max(
                     predictions_prob, dim=1
                 )
-                if max_probability_predicted.item() >= 0.15:
+                if (
+                    max_probability_predicted.item()
+                    >= HAND_SIGN_MIN_DETECTION_CONFIDENCE
+                ):
                     predicted_character = chr(
                         max_probability_index.item() + 65
                     )  # chr(65) = 'A'
                     return predicted_character
-        return "None"
 
     def stop(self):
         del self.__model__

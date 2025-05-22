@@ -89,7 +89,10 @@ class Camera:
         """
         if top_left_boundary and bottom_right_boundary:
             x1, y1 = top_left_boundary
-            x2, y2 = bottom_right_boundary
+            x2, y2 = (
+                bottom_right_boundary[0] + 20,
+                bottom_right_boundary[1] + 20,
+            )
 
             cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 0), 4)
             cv2.putText(

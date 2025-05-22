@@ -25,9 +25,6 @@ class WordSearch:
         data structure. Time complexity O(n) with n being total number of words
         in the given list.
 
-        Returns:
-            None: DESCRIPTION.
-
         """
 
         for word in self.__word_lst__:
