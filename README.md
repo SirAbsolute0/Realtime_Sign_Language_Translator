@@ -8,18 +8,20 @@ As the user constructs a word, the software dynamically offers word suggestions 
 ![Third set of characters](https://github.com/SirAbsolute0/Realtime_Sign_Language_Translator/blob/main/hand_description_3.jpg)
 ## How It's Made:
 
-**Tech used:** Python, PyQt, cv2, MediaPipe, Pytorch
+**Tech used:** Python, PyQt, cv2, MediaPipe, Pytorch, Trie Node DS
 
-Here's where you can go to town on how you actually built this thing. Write as much as you can here, it's totally fine if it's not too much just make sure you write *something*. If you don't have too much experience on your resume working on the front end that's totally fine. This is where you can really show off your passion and make up for that ten fold.
+The GUI is built with PyQt Designer with a combination of QtWidgets (QLayout, QLabel, QListWidget, QButton, etc). The backend utilizes Python to handle all logic using QtSignals and QtSlots. The hand landmark detection is handled by Google's MediaPipe model, which detects 23 landmarks per hand through the front-facing camera with OpenCV. The software currently only supports hand signs made using the left hand. After the software detects the 23 landmarks, the data is pushed to a Pytorch Neural Network model to translate the landmarks to a character in the alphabet. The hand sign to character table is shown above in the software description. As the user enters more characters to build a word, the software dynamically searches its dictionary, tries to auto-complete the word, and suggests it to the user. The word dictionary is built on a Trie Node data structure, which is loaded at startup with over 10,000 words.
 
 ## Optimizations
-*(optional)*
+Initially, I utilized a random forest model to translate from the 23 hand landmarks to a character, which showed to work great based on the accuracy result of the validation data set (correct predictions/all predictions). However, the live model didn't perform well and would get a lot of missed detections (detect wrong characters). Thus, I decided to switch to a neural net model since the fundamental idea of a neural net model is more aligned with the software's purpose compared to a random forest model. Specifically, a random forest model decision is based on data being passed and checked through each branch  of a decision tree, and the final decision is made with the overall decision of all trees. Since the data is being passed along 1 at a time down the branches, the data has to be sequentially related. However, each hand landmark is not related sequentially, each hand landmark should have the same weight in deciding the final output of the character, so making a decision at each branch with only 1 hand landmark and making another decision at a later branch with another hand landmark can't utilize the hand landmarks well. On the other hand, a neural net model input can be multiple variables, and all are considered at once. All 23 landmarks can be considered at once at every layer to better translate into a character.
 
-You don't have to include this section but interviewers *love* that you can not only deliver a final product that looks great but also functions efficiently. Did you write something then refactor it later and the result was 5x faster than the original implementation? Did you cache your assets? Things that you write in this section are **GREAT** to bring up in interviews and you can use this section as reference when studying for technical interviews!
+Another optimization I made as I was building the software was the usage of a Trie Node for the auto-completion search tree. I came across this data structure as I was studying leetcode for upcoming interviews and realized how useful it is in use cases such as my software where the initial loading time might take awhile (with loading 10,000 words into a tree), the auto-completion for each word is almost in constant time and can be done quickly as the user enter more and more character without bogging down the user with wait time. 
 
 ## Lessons Learned:
-
-No matter what your experience level, being an engineer means continuously learning. Every time you build something you always have those *whoa this is awesome* or *wow I actually did it!* moments. This is where you should share those moments! Recruiters and interviewers love to see that you're self-aware and passionate about growing.
+Some of the key lessons I learned are:
+1. How important is choosing the correct machine learning model for a problem.
+2. Leetcode data structure can be useful in real day-to-day engineering development.
+3. Its not about having the perfect software but about having a complete software package that serves a purpose and can improve overtime.
 
 
 
