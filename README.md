@@ -5,7 +5,7 @@ As the user constructs a word, the software dynamically offers word suggestions 
 
 ![First set of characters](https://github.com/SirAbsolute0/Realtime_Sign_Language_Translator/blob/main/hand_description_0.jpg)
 ![Second set of characters](https://github.com/SirAbsolute0/Realtime_Sign_Language_Translator/blob/main/hand_description_1.jpg)
-![Third set of characters](https://github.com/SirAbsolute0/Realtime_Sign_Language_Translator/blob/main/hand_description_2.jpg)
+![Third set of characters](https://github.com/SirAbsolute0/Realtime_Sign_Language_Translator/blob/main/hand_description_3.jpg)
 ## How It's Made:
 
 **Tech used:** Python, PyQt, cv2, MediaPipe, Pytorch
