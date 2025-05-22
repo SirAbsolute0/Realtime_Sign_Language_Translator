@@ -1,5 +1,6 @@
 import sys
 from PyQt5.QtGui import QPixmap, QColor
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from gui import Ui_MainWindow
 from camera_worker import CameraWorker
@@ -15,6 +16,9 @@ class Main_Window(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         ####################
+
+        # Set Qlabel properties
+        self.ui.output.setTextInteractionFlags(Qt.TextSelectableByMouse)
 
         # Buttons slot assignment
         self.ui.clear_btn.clicked.connect(self.clear_btn_clicked)
