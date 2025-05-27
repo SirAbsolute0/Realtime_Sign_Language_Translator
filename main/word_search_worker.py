@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 File contains class definition for word search worker to do work search
 concurrently on another thread with other parts of the software
@@ -7,7 +6,7 @@ concurrently on another thread with other parts of the software
 from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
 from word_search import WordSearch
 
-HAND_SIGN_DETERMINATION_TIME_LIMIT = 60
+HAND_SIGN_DETERMINATION_TIME_COUNTER = 60
 
 
 class WordSearchWorker(QThread):
@@ -49,7 +48,7 @@ class WordSearchWorker(QThread):
             and predicted_char != ""
         ):
             self.__counter__ += 1
-            if self.__counter__ >= HAND_SIGN_DETERMINATION_TIME_LIMIT:
+            if self.__counter__ >= HAND_SIGN_DETERMINATION_TIME_COUNTER:
                 self.__current_word__ += predicted_char.lower()
                 self.__display_possible_words__()
 
@@ -69,4 +68,4 @@ class WordSearchWorker(QThread):
         self.__current_word__ = ""
 
     def stop(self):
-        del self.__word_search__
+        next

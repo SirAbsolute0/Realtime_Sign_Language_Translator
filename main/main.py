@@ -17,7 +17,7 @@ class Main_Window(QMainWindow):
         self.ui.setupUi(self)
         ####################
 
-        # Set Qlabel properties
+        # Set Qlabel property to be highlighted by mouse
         self.ui.output.setTextInteractionFlags(Qt.TextSelectableByMouse)
 
         # Buttons slot assignment
@@ -62,7 +62,7 @@ class Main_Window(QMainWindow):
 
     def shutdown_workers(self, workers: list[object]) -> None:
         """
-        Function to gracefully end all threads and their class objects
+        Function to end all threads and their class objects
 
         Args:
             workers (list[QThread]): Qthread workers currently running.
@@ -100,6 +100,7 @@ class Main_Window(QMainWindow):
             word_list (list): auto completed list of words for display.
 
         """
+        # Flash camera feed for 1 second indicating a character was chosen
         self.signal_chosen_character_flash_screen()
         self.ui.word_choice.clear()
         self.ui.word_choice.addItems(word_list)

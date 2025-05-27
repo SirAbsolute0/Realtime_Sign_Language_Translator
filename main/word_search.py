@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """
-Class to build a TrieNode for word search using a preloaded list of 10000
-words.
+Contain class definition for word search using a TrieNode datatructure and a
+preloaded list of 10000 words.
 """
 
 WORD_LIST_FILE = "wordlist_10000.txt"
