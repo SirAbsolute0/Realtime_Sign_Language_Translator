@@ -34,7 +34,7 @@ class PredictionModel:
         )
 
         # Pytorch neural net model detection
-        self.__model__ = torch.jit.load("model.pth.rar")
+        self.__model__ = torch.jit.load("model_2_1.pth.rar")
         self.__model__.eval()
         self.__model__.to(DEVICE)
 
