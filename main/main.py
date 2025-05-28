@@ -75,7 +75,7 @@ class Main_Window(QMainWindow):
 
         for worker in workers:
             if worker.isRunning():
-                worker.wait()
+                worker.wait(1)
 
     def camera_update_slot(self, frame) -> None:
         """
