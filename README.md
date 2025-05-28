@@ -3,9 +3,9 @@ The software is designed to enable text input through hand sign language recogni
 
 As the user constructs a word, the software dynamically offers word suggestions through an auto-completion feature, which updates in real time as new characters are detected. Users may either select a suggested word from the list or continue inputting additional characters. Once a word is selected, it is appended to the final output area, allowing the user to build complete sentences. The finalized text can then be copied for use elsewhere.
 
-<img src="https://github.com/SirAbsolute0/Realtime_Sign_Language_Translator/raw/main/software_description/Hand_Sign_Description_0.jpg" width="400" height="600"/>
-![Second set of characters](https://github.com/SirAbsolute0/Realtime_Sign_Language_Translator/blob/main/software_description/Hand_Sign_Description_1.jpg)
-![Third set of characters](https://github.com/SirAbsolute0/Realtime_Sign_Language_Translator/blob/main/software_description/Hand_Sign_Description_2.jpg)
+<img src="https://github.com/SirAbsolute0/Realtime_Sign_Language_Translator/raw/main/software_description/Hand_Sign_Description_0.jpg" width="600" height="800"/>
+<img src="https://github.com/SirAbsolute0/Realtime_Sign_Language_Translator/raw/main/software_description/Hand_Sign_Description_1.jpg" width="600" height="800"/>
+<img src="https://github.com/SirAbsolute0/Realtime_Sign_Language_Translator/raw/main/software_description/Hand_Sign_Description_2.jpg" width="600" height="800"/>
 ## How It's Made:
 
 **Tech used:** Python, PyQt, cv2, MediaPipe, Pytorch, Trie Node DS
