@@ -19,6 +19,7 @@ print(f"Using {DEVICE} device")
 
 LANDMARK_MIN_DETECTION_CONFIDENCE = 0.6
 HAND_SIGN_MIN_DETECTION_CONFIDENCE = 0.6
+NEURAL_NET_MODEL_FILE_NAME = "model_3.pth.rar"
 
 
 class PredictionModel:
@@ -34,7 +35,7 @@ class PredictionModel:
         )
 
         # Pytorch neural net model detection
-        self.__model__ = torch.jit.load("model_2_1.pth.rar")
+        self.__model__ = torch.jit.load(NEURAL_NET_MODEL_FILE_NAME)
         self.__model__.eval()
         self.__model__.to(DEVICE)
 
@@ -129,6 +130,7 @@ class PredictionModel:
                     max_probability_predicted.item()
                     >= HAND_SIGN_MIN_DETECTION_CONFIDENCE
                 ):
+                    print(max_probability_index.item())
                     predicted_character = chr(
                         max_probability_index.item() + 65
                     )  # chr(65) = 'A'
