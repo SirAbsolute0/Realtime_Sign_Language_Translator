@@ -49,6 +49,9 @@ class Main_Window(QMainWindow):
         self.prediction_workder.hand_sign_prediction_ready.connect(
             self.word_search_worker.add_predicted_char
         )
+        self.word_search_worker.special_character_signal.connect(
+            self.add_special_character
+        )
         self.ui.word_choice.itemClicked.connect(self.word_list_item_clicked)
         self.word_search_worker.start()
 
@@ -120,7 +123,7 @@ class Main_Window(QMainWindow):
         if text_output == "":
             word = word.capitalize()
 
-        text_output += word + " "
+        text_output += word
         self.ui.output.setText(text_output)
         self.clear_btn_clicked()
 
@@ -153,6 +156,20 @@ class Main_Window(QMainWindow):
         """
 
         self.ui.output.clear()
+        self.clear_btn_clicked()
+
+    def add_special_character(self, character: str) -> None:
+        """
+        Add special character to current output
+
+        Args:
+            character (str): special characters such as "space" and "period".
+
+        """
+
+        text_output = self.ui.output.text()
+        text_output += character
+        self.ui.output.setText(text_output)
         self.clear_btn_clicked()
 
     def exit_btn_clicked(self) -> None:

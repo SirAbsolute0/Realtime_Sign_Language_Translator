@@ -19,7 +19,7 @@ print(f"Using {DEVICE} device")
 
 LANDMARK_MIN_DETECTION_CONFIDENCE = 0.6
 HAND_SIGN_MIN_DETECTION_CONFIDENCE = 0.6
-NEURAL_NET_MODEL_FILE_NAME = "model_3.pth.rar"
+NEURAL_NET_MODEL_FILE_NAME = "model_3_1.pth.rar"
 
 
 class PredictionModel:
@@ -110,7 +110,8 @@ class PredictionModel:
             data_aux (list): list of hand landmarks detected using media pipe.
 
         Returns:
-            str: the predicted character (A - Z).
+            str: the predicted character (A - Z) or special characters:
+                Space, Delete, and Period.
 
         """
 
@@ -130,10 +131,17 @@ class PredictionModel:
                     max_probability_predicted.item()
                     >= HAND_SIGN_MIN_DETECTION_CONFIDENCE
                 ):
-                    print(max_probability_index.item())
-                    predicted_character = chr(
-                        max_probability_index.item() + 65
-                    )  # chr(65) = 'A'
+                    match max_probability_index.item():
+                        case v if v <= 25:
+                            predicted_character = chr(
+                                max_probability_index.item() + 65
+                            )  # chr(65) = 'A'
+                        case 26:
+                            predicted_character = "Space"
+                        case 27:
+                            predicted_character = "Delete"
+                        case 28:
+                            predicted_character = "Period"
                     return predicted_character
 
     def stop(self):

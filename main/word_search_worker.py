@@ -11,6 +11,7 @@ HAND_SIGN_DETERMINATION_TIME_COUNTER = 60
 
 class WordSearchWorker(QThread):
     auto_complete_result_ready = pyqtSignal(list)
+    special_character_signal = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
@@ -49,9 +50,16 @@ class WordSearchWorker(QThread):
         ):
             self.__counter__ += 1
             if self.__counter__ >= HAND_SIGN_DETERMINATION_TIME_COUNTER:
-                self.__current_word__ += predicted_char.lower()
-                self.__display_possible_words__()
+                if predicted_char == "Space":
+                    self.special_character_signal.emit(" ")
+                elif predicted_char == "Delete":
+                    self.__current_word__ = self.__current_word__[:-1]
+                elif predicted_char == "Period":
+                    self.special_character_signal.emit(".")
+                else:
+                    self.__current_word__ += predicted_char.lower()
 
+                self.__display_possible_words__()
                 self.__counter__ = 0
         else:
             self.__counter__ = 0
