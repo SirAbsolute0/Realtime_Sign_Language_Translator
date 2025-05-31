@@ -4,6 +4,7 @@ The software is designed to enable text input through hand sign language recogni
 As the user enters more alphabetic characters to construct a word, the software dynamically offers word suggestions, which are updated in real time as new characters are added. Users can select a suggested word from the list or continue inputting additional characters to find the desired word. Once a word is selected, it is appended to the final output area, allowing the user to build complete sentences. Additionally, the user can use the special characters of "Space" and "Period" to write full sentences. The finalized text can then be copied for use elsewhere.
 
 Below is the translation from hand signs to characters:
+
 <img src="https://github.com/SirAbsolute0/Realtime_Sign_Language_Translator/raw/main/software_description/Hand_Sign_Description_0.jpg" width="600" height="800"/>
 <img src="https://github.com/SirAbsolute0/Realtime_Sign_Language_Translator/raw/main/software_description/Hand_Sign_Description_1.jpg" width="600" height="800"/>
 <img src="https://github.com/SirAbsolute0/Realtime_Sign_Language_Translator/raw/main/software_description/Hand_Sign_Description_2.jpg" width="600" height="800"/>
