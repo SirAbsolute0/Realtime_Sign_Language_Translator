@@ -3,6 +3,8 @@ The software is designed to enable text input through hand sign language recogni
 
 As the user enters more alphabetic characters to construct a word, the software dynamically offers new word suggestions. Users can select a suggested word from the list or continue inputting additional characters to find the desired word. Once a word is selected, it is appended to the final output area, allowing the user to complete a sentence. Additionally, the user can use the special characters: "Space" and "Period" to write full paragraphs. The finalized text can then be copied for use elsewhere.
 
+To run the program, please use the requirements.txt to install the necessary dependencies into your virtual environment. Noted, my current environment uses CUDA 11.8 with an RTX 2070 SUPER; thus, I also have the Pytorch package that works with CUDA 11.8 pre-installed. Your environment might have a different GPU with a different CUDA version, so you will need to install this package independently.
+
 Below is the translation from hand signs to characters:
 
 <img src="https://github.com/SirAbsolute0/Realtime_Sign_Language_Translator/raw/main/software_description/Hand_Sign_Description_0.jpg" width="600" height="800"/>
@@ -11,7 +13,7 @@ Below is the translation from hand signs to characters:
 
 ## How It's Made:
 
-**Tech used:** Python, PyQt, Open-CV, MediaPipe, Pytorch, Trie Node DS, PyInstaller, and many more
+**Tech used:** Python, PyQt, Open-CV, MediaPipe, Pytorch, Trie Node DS, and many more
 
 The GUI is built using PyQt Designer with a combination of QtWidgets (QLayout, QLabel, QListWidget, QButton, etc). The backend utilizes Python to handle all logic using QtSignals and QtSlots. The hand landmark detection is handled by Google's MediaPipe model, which detects 23 landmarks per hand through the front-facing camera using Open-CV. The software currently only supports hand signs made using the left hand. After the software detects the 23 landmarks, the data is pushed to a Pytorch Neural Network model running on a GPU to translate the landmarks to a character in the alphabet or one of these special characters: "Space", "Delete", "Period". As the user enters more characters to build a word, the software dynamically searches its dictionary, tries to auto-complete the word, and suggests possible words to the user. The word dictionary is built on a Trie Node data structure, which is loaded at startup with over 10,000 words.
 
@@ -24,7 +26,9 @@ During training the neural net model with Pytorch, I specifically took the long 
 3. Expanding classification categories of a pre-trained model: For folders with different starting versions (ver1, ver2, and ver3, etc), the changes between models are significant (meaning the model structure itself changes or something major within the model changed). During version 2 to version 3, I expanded the classification categories from 26 (a-z) to 29 to accommodate new special characters, and the change in version signifies a  major shift in the model structure.
 4. Comparing results between various models and determining which model is the best for the latest version: The more models I trained, the more I realized how difficult it is to keep track of every possible result of each model, especially when those results are scattered throughout different Jupyter notebook files. Thus, in the next project, I will implement a MLOPS technique to support model development, such as MlFlow. 
    
-Another optimization I made as I was building the software was the usage of a Trie Node for the auto-completion search tree. I came across this data structure as I was studying leetcode for upcoming interviews and realized how useful it is in use cases such as my software where the initial loading time might take awhile (with loading 10,000 words into a tree), the auto-completion for each word is almost in constant time and can be done quickly as the user enter more and more character without bogging down the user with wait time. 
+Another optimization I made as I was building the software was the usage of a Trie Node for the auto-completion search tree. I came across this data structure as I was studying leetcode for upcoming interviews and realized how useful it is in use cases such as my software where the initial loading time might take awhile (with loading 10,000 words into a tree), the auto-completion for each word is almost in constant time and can be done quickly as the user enter more and more character without bogging down the user with wait time.
+
+Additionally, I have created an executable file with the current working version of the software, and it does work, but it's too big to upload to GitHub without a subscription. The necessary content needed to create the executable using PyInstaller is in main.spec where it will make a build and dist folder containing "main.exe".
 
 ## Lessons Learned:
 Some of the key lessons I learned are:
