@@ -4,14 +4,24 @@ Contains the class definition to initiate the camera object using cv2.
 Additionally, the class contains the hand landmarks mapping with mediapipe.
 """
 
-import cv2
+from cv2 import (
+    VideoCapture,
+    cvtColor,
+    COLOR_BGR2RGB,
+    flip,
+    rectangle,
+    putText,
+    FONT_HERSHEY_SIMPLEX,
+    LINE_AA,
+    destroyAllWindows,
+)
 from PyQt5.QtGui import QImage
 from typing import Optional
 
 
 class Camera:
     def __init__(self):
-        self.__cap__ = cv2.VideoCapture(0)
+        self.__cap__ = VideoCapture(0)
 
     def collect_frame(self) -> Optional[object]:
         """
@@ -24,8 +34,8 @@ class Camera:
 
         ret, frame = self.__cap__.read()
         if ret:
-            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            frame_flipped = cv2.flip(frame_rgb, 1)
+            frame_rgb = cvtColor(frame, COLOR_BGR2RGB)
+            frame_flipped = flip(frame_rgb, 1)
             return frame_flipped
 
     def generate_final_frame(
@@ -94,19 +104,19 @@ class Camera:
                 bottom_right_boundary[1] + 20,
             )
 
-            cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 0), 4)
-            cv2.putText(
+            rectangle(frame, (x1, y1), (x2, y2), (255, 0, 0), 4)
+            putText(
                 frame,
                 predicted_char,
                 (x2, y2 - 10),
-                cv2.FONT_HERSHEY_SIMPLEX,
+                FONT_HERSHEY_SIMPLEX,
                 1.3,
                 (255, 0, 0),
                 3,
-                cv2.LINE_AA,
+                LINE_AA,
             )
         return frame
 
     def stop(self) -> None:
         self.__cap__.release()
-        cv2.destroyAllWindows()
+        destroyAllWindows()
