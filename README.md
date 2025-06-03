@@ -3,7 +3,7 @@ The software is designed to enable text input through hand sign language recogni
 
 As the user enters more alphabetic characters to construct a word, the software dynamically offers new word suggestions. Users can select a suggested word from the list or continue inputting additional characters to find the desired word. Once a word is selected, it is appended to the final output area, allowing the user to complete a sentence. Additionally, the user can use the special characters: "Space" and "Period" to write full paragraphs. The finalized text can then be copied for use elsewhere.
 
-To run the program, please use the requirements.txt to install the necessary dependencies into your virtual environment. Noted, my current environment uses CUDA 11.8 with an RTX 2070 SUPER; thus, I also have the Pytorch package that works with CUDA 11.8 pre-installed. Your environment might have a different GPU with a different CUDA version, so you will need to install this package independently.
+To run the program, please use the requirements.txt to install the necessary dependencies into your virtual environment. Noted, my current environment uses CUDA 11.8 with an RTX 2070 SUPER; thus, I also have the Pytorch package that works with CUDA 11.8 pre-installed. Your environment might have a different GPU with a different CUDA version, so you will need to install this package independently. Afterwards, you can run main.py, and everything else should work as intended.
 
 Below is the translation from hand signs to characters:
 
