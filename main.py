@@ -1,4 +1,4 @@
-import sys
+from sys import argv, exit
 from PyQt5.QtGui import QPixmap, QColor
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow
@@ -177,7 +177,7 @@ class Main_Window(QMainWindow):
 
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
+    app = QApplication(argv)
     window = Main_Window()
     window.show()
-    sys.exit(app.exec_())
+    exit(app.exec_())

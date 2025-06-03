@@ -5,14 +5,23 @@ and predict hand sign based on hand landmarks using Pytorch neural network
 model. The model currently predicts only LEFT hand sign and has 26 letters
 prediction.
 """
-import mediapipe as mp
-import torch
+from mediapipe import solutions
+from torch import (
+    accelerator,
+    jit,
+    no_grad,
+    tensor,
+    float32,
+    exp,
+    max as torch_max,
+    cuda,
+)
 from typing import Optional
 
 # using GPU for neural network prediction
 DEVICE = (
-    torch.accelerator.current_accelerator().type
-    if torch.accelerator.is_available()
+    accelerator.current_accelerator().type
+    if accelerator.is_available()
     else "cpu"
 )
 print(f"Using {DEVICE} device")
@@ -25,9 +34,9 @@ NEURAL_NET_MODEL_FILE_NAME = "model_3_2.pth.rar"
 class PredictionModel:
     def __init__(self):
         # Mediapipe lanndmarks detection
-        self.__mp_hands__ = mp.solutions.hands
-        self.__mp_drawing__ = mp.solutions.drawing_utils
-        self.__mp_drawing_styles__ = mp.solutions.drawing_styles
+        self.__mp_hands__ = solutions.hands
+        self.__mp_drawing__ = solutions.drawing_utils
+        self.__mp_drawing_styles__ = solutions.drawing_styles
         self.__hands__ = self.__mp_hands__.Hands(
             static_image_mode=True,
             min_detection_confidence=LANDMARK_MIN_DETECTION_CONFIDENCE,
@@ -35,7 +44,7 @@ class PredictionModel:
         )
 
         # Pytorch neural net model detection
-        self.__model__ = torch.jit.load(NEURAL_NET_MODEL_FILE_NAME)
+        self.__model__ = jit.load(NEURAL_NET_MODEL_FILE_NAME)
         self.__model__.eval()
         self.__model__.to(DEVICE)
 
@@ -116,15 +125,13 @@ class PredictionModel:
         """
 
         if data_aux:
-            with torch.no_grad():
-                data_aux = torch.tensor(
-                    data_aux, dtype=torch.float32
-                ).flatten()
+            with no_grad():
+                data_aux = tensor(data_aux, dtype=float32).flatten()
                 predictions_log = self.__model__(
                     data_aux.unsqueeze(0).to(DEVICE)
                 )
-                predictions_prob = torch.exp(predictions_log)
-                max_probability_predicted, max_probability_index = torch.max(
+                predictions_prob = exp(predictions_log)
+                max_probability_predicted, max_probability_index = torch_max(
                     predictions_prob, dim=1
                 )
                 if (
@@ -146,4 +153,4 @@ class PredictionModel:
 
     def stop(self):
         del self.__model__
-        torch.cuda.empty_cache()
+        cuda.empty_cache()
