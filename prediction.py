@@ -19,7 +19,7 @@ print(f"Using {DEVICE} device")
 
 LANDMARK_MIN_DETECTION_CONFIDENCE = 0.6
 HAND_SIGN_MIN_DETECTION_CONFIDENCE = 0.6
-NEURAL_NET_MODEL_FILE_NAME = "model_3_1.pth.rar"
+NEURAL_NET_MODEL_FILE_NAME = "model_3_2.pth.rar"
 
 
 class PredictionModel:
